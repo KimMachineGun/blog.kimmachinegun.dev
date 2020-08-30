@@ -1,0 +1,4 @@
+blogger_url: https://blog.kimmachinegun.dev
+credential_path: ./credentials.json
+cache_path: ./.blogger.token
+posts_path: ./posts
