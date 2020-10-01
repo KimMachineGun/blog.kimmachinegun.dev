@@ -1,32 +1,32 @@
 ---
-id: "8760145411003659754"
-title: "Go: Interface Mocking With Mockc"
+id: "5772176581110782864"
+title: "Go: Mockc로 인터페이스 모킹하기"
 tags:
-  - eng
   - Go
+  - kor
   - Mockc
 status: 1
 ---
 
 # Introduction
-There are so many mocking libraries in Go ecosystem. But most of them are very difficult to use and learn. I think the main reason is they force you to use specific functions for assertion. Even if those functions provide powerful features, they are usually not intuitive and type-safe.
+이미 Go 생태계에는 꽤 많은 모킹 라이브러리가 있습니다. 하지만 그중 대부분이 쉽게 배우고 사용하기 힘듭니다. 저는 그 이유가 테스트 코드에서 라이브러리에서 제공하는 특정 함수의 사용을 강제하기 때문이라 생각합니다. 이러한 함수들은 강력한 기능을 갖고있을 지라도, 보통은 비직관적이고 타입 세이프하지 않은 인터페이스를 제공하는 경우가 많습니다.
 
-So, I created a simple mock generator so that you could test your code in an intuitive way. And its name is _'[Mockc](https://github.com/KimMachineGun/mockc)'_.
+그래서 직관적이고 아주 간단한 방법으로 모킹하고 테스트 할 수 있도록 도와주는, _'[Mockc](https://github.com/KimMachineGun/mockc)'_ 라는 라이브러리를 만들게 되었습니다.
 
-Let's take an overview!
+그럼 살펴보도록 하겠습니다!
 
 # Overview
-It provides two ways for generating mock. In this post, I'll only cover the way using **Mock Generator**.
+**Mockc**는 목을 생성하기 위한 두 가지 방법을 제공합니다. 이 글에서는 **Mock Generator**를 사용한 방법을 살펴보도록 하겠습니다.
 
-Before we get started, install the command-line tool `mockc` first!
+일단, 커맨드라인 툴인 `mockc`를 먼저 설치해보겠습니다.
 
 ```sh
 go get github.com/KimMachineGun/mockc/cmd/mockc
 ```
 
-Then you'll get `mockc` installed in your `$GOPATH/bin`.
+위 커맨드를 실행하셨다면, `$GOPATH/bin` 하위에 `mockc`가 설치됐을 것입니다.
 
-This is our target interface and simple implementation of it.
+아래는 이 글에서 **Mockc**를 통해 모킹할 인터페이스와 그의 간단한 구현체입니다.
 
 ```go
 // cache.go
@@ -75,11 +75,11 @@ func HasKey(c Cache, key string) (bool, error) {
 }
 ```
 
-Before generating mock, you need to know about the concept of **Mock Generator**.
+목을 생성하기에 앞서 **Mock Generator**가 무엇인지 먼저 알아보겠습니다.
 
-**Mock Generator**: A configuration code for generating mock written in Go syntax. It allows you to configure the name of mock, destination file, constructor generating option, etc.
+**Mock Generator**: Go 문법으로 쓰여진 목 생성 옵션을 명시하기 위한 코드로, 이를 통해 목의 이름, 새성될 파일 이름, 생성자 생성 옵션 등을 수정할 수 있습니다.
 
-Let's write a **Mock Generator**.
+그럼 **Mock Generator**를 실제로 작성해보도록 하겠습니다.
 
 ```go
 // mockc.go
@@ -97,20 +97,21 @@ func MockcCache() {
 }
 ```
 
-Note: In order to ignore **Mock Generator** file in regular compilation, you should put the build tag `//+build mockc` at the first line of your file.
+Note: **Mock Generaotr**를 일반적인 컴파일에서 제외하기 위해, 파일의 최상단에 `//+build mockc` 빌드 태그를 **꼭** 넣어줘야 합니다.
 
-The `func MockcCache()` is the **Mock Generator**. **Mock Generator** must be a function and call `mockc.Implement` with the interfaces that you want to implement. And, the name of function(`MockcCache`) will be the name of mock.
+`func MockcCache()`가 바로 **Mock Genrator**입니다. **Mock Generator**는 Go의 함수 형태로 작성해야 하며, 함수 내부에서 `mockc.Implement`를 모킹하고자 하는 인터페이스와 함께 호출해야 합니다. 그리고 **Mock Generator** 함수의 이름(`MockcCache`)이 추후 생성될 목의 이름이 됩니다.
 
-In this example, `MockcCache` calls `mockc.WithConstructor` too. It is an optional configuration function, and it means the mock constructor will be generated together.
+이 예시에서는 `MockCache`가 `mockc.WithConstructor`를 함께 호출했습니다. `mockc.WithConstructor`는 목의 생성 옵션을 설정하는 함수로, 목이 생성될 때 목 생성자 함수도 함께 생성되도록 합니다.
 
-You can find all configuration functions such as `mockc.WithConstructor` [here](https://pkg.go.dev/github.com/KimMachineGun/mockc?tab=doc).
+`mockc.WithConstructor`와 같은 목 생성 옵션 설정 함수는 필요에 따라 선택적으로 사용할 수 있으며, [여기](https://pkg.go.dev/github.com/KimMachineGun/mockc?tab=doc)에서 모든 설정 함수를 확인할 수 있습니다.
 
-Now, you can generate mock by using the command-line tool mockc we installed before.
+위 예시와 같이 **Mock Generator**를 작성했다면, 전에 설치한 커맨드라인 툴을 사용하여 바로 목을 생성해보겠습니다.
 
-```sh
+```s다
 mockc
 ```
-After you run this command, `mockc_gen.go` will be generated.
+
+위 커맨드가 정상적으로 실행됐다면, 아래와 같은 `mockc_gen.go` 파일이 생성됐을 것입니다.
 
 ```go
 // mockc_gen.go
@@ -315,11 +316,11 @@ func (recv *MockcCache) Set(p0 string, p1 interface{}) error {
 }
 ```
 
-The generated `MockCache` implements the interfaces you provided before. And you can set the return values of the method and get the call count and call histories through its fields(by default, the field name will be '`_{MethodName}`' and you can change the prefix and suffix by using the `mockc.SetFieldNamePrefix` and `mockc.SetFieldNameSuffix`).
+생성된 `MockCache`는 **Mock Generator** 내부에서 `mockc.Implement`에 인자로 넘겨줬던 `Cache` 인터페이스를 구현할 것이고, 메서드의 반환 값이나, 메서드 호출 히스토리와 같은 검증을 위한 값은 `MockCache`의 필드를 통해 접근할 수 있습니다. (기본적으로 필드의 이름은 '`_{MethodName}`'이고, `mockc.SetFieldNamePrefix`와 `mockc.SetFieldNameSuffix` 생성 옵션 설정 함수를 통해 prefix, suffix를 변경할 수 있습니다.)
 
-Once generated successfully, you can use it right away!
+위 절차를 통해 목이 성공적으로 생성됐다면, 바로 사용해볼 수 있습니다.
 
-This is my example test code.
+아래는 생성된 목을 사용한 테스트 코드의 예시입니다.
 
 ```go
 // cache_test.go
@@ -407,11 +408,11 @@ func TestHasKey_WithMapCache(t *testing.T) {
 }
 ```
 
-You can find more examples [here](https://github.com/KimMachineGun/mockc/tree/master/examples).
+위 테스트 코드는 하나의 예시일 뿐입니다. **Mockc**를 통해 생성된 목은 직관적이고, 쉽게 커스텀 가능한 인터페이스를 제공하고 있기 때문에 원하는 패턴으로 자유롭게 테스트를 구성할 수 있습니다. 더 많은 예시는 [여기](https://github.com/KimMachineGun/mockc/tree/master/examples)에서 확인할 수 있습니다.
 
 # Conclusion
-In this post, we took an overview of **Mockc**. I agree that it's not a perfect tool. There must be pros and cons. Some people may not like its approach(using build tag, code generation, etc...). Still, some will like its straightforwardness and simplicity.
+이 글을 통해 **Mockc**가 무엇이고 어떻게 사용할 수 있는지 아주 간단하게 살펴봤습니다. **Mockc**가 모두를 만족시킬 만한 완벽한 라이브러리라 생각하지 않습니다. 다른 라이브러리들과 비교했을 때 분명 장단점이 있을 것입니다. 어떤 사람들은 **Mockc**의 직관적인 인터페이스와 간결함이 마음에 들테지만, 또 어떤 사람들은 **Mockc**가 모킹을 위해 사용하는 방법(빌드 태그 사용, 코드 제너레이션 등)이 마음에 들지 않을 수 있습니다.
 
-**Mockc** is evolving rapidly, and it really needs your feedback and contribution. Any kind of feedback is much appreciated.
+하지만 **Mockc**는 여전히 빠르게 발전하는 중이고, 더 많은 사람들이 편하게 사용할 수 있는 방향으로 나아가고 싶습니다. 그렇기에 여러분의 피드백과 기여가 절실히 필요합니다. 어떤 피드백도 감사히 받겠습니다.
 
-Thank you!
+감사합니다!
